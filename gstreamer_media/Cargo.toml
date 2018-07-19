@@ -1,0 +1,9 @@
+[package]
+name = "gstreamer_media"
+version = "0.1.0"
+authors = ["Marek G <no@mail.com>"]
+
+[dependencies]
+failure = "*"
+gstreamer = "*"
+gstreamer-app = "*"
