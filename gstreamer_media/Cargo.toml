@@ -7,3 +7,7 @@ authors = ["Marek G <no@mail.com>"]
 failure = "*"
 gstreamer = "*"
 gstreamer-app = "*"
+glib = "*"
+
+[build-dependencies]
+pkg-config = "*"
