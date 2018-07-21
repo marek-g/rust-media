@@ -1,5 +1,6 @@
 extern crate gstreamer as gst;
 extern crate gstreamer_app as gst_app;
+extern crate gstreamer_gl_sys as gst_gl_sys;
 use self::gst::prelude::*;
 use self::gst::MessageView;
 use self::gst::Context;
@@ -168,8 +169,16 @@ pub fn create_opengl_pipeline_url(url: &str) -> (gst::Pipeline, gst::Element) {
                 let src = message.get_src().unwrap().dynamic_cast::<gst::Element>().unwrap();;
                 println!("need context: {:?}, src: {:?}", context_type, src);
 
+                let test = unsafe {
+                    gst_gl_sys::gst_gl_display_new();
+                };
+
                 // TODO: add binding for gst_gl_context_new_wrapped from /usr/lib/libgstgl-1.0
                 // (I've got GstGL-1.0.gir for it!)
+                //
+                // sdl_gl_display = gst_gl_display_new ();
+                // sdl_gl_display = (GstGLDisplay *) gst_gl_display_x11_new_with_display (sdl_display);
+                //
                 // gst_sdl_context =
                 //      gst_gl_context_new_wrapped (sdl_gl_display, (guintptr) sdl_gl_context,
                 //      gst_gl_platform_from_string (platform), GST_GL_API_OPENGL);
