@@ -1,6 +1,7 @@
 extern crate gstreamer as gst;
 extern crate gstreamer_app as gst_app;
 extern crate gstreamer_gl_sys as gst_gl_sys;
+extern crate glutin;
 use self::gst::prelude::*;
 use self::gst::MessageView;
 use self::gst::Context;
@@ -133,7 +134,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
     (pipeline, video_app_sink)
 }
 
-pub fn create_opengl_pipeline_url(url: &str) -> (gst::Pipeline, gst::Element) {
+pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst::Pipeline, gst::Element) {
     let source = gst::ElementFactory::make("uridecodebin", "source")
         .expect("Could not create uridecodebin element.");
     source.set_property_from_str("uri", url);
