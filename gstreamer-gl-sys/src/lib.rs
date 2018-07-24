@@ -4,6 +4,8 @@ extern crate libc;
 extern crate glib_sys as glib;
 extern crate gstreamer_sys as gst;
 extern crate gstreamer_base_sys as gst_base;
+extern crate x11_dl;
+extern crate gtypes;
 
 #[allow(unused_imports)]
 use libc::{c_int, c_char, c_uchar, c_float, c_uint, c_double,
@@ -14,20 +16,65 @@ use libc::{c_int, c_char, c_uchar, c_float, c_uint, c_double,
 use glib::{gboolean, gconstpointer, gpointer, GType, Volatile};
 
 use gst::GstContext;
+use gst::GstStructure;
 
 #[repr(C)]
-pub struct GstGLDisplay(c_void);
+#[derive(Copy, Clone)]
+pub struct GstGLDisplay(*mut c_void);
+
+unsafe impl Sync for GstGLDisplay {}
+unsafe impl Send for GstGLDisplay {}
 
 #[repr(C)]
-pub struct GstGLDisplayX11(c_void);
+#[derive(Copy, Clone)]
+pub struct GstGLDisplayX11(*mut c_void);
+
+unsafe impl Sync for GstGLDisplayX11 {}
+unsafe impl Send for GstGLDisplayX11 {}
+
+impl GstGLDisplayX11 {
+    pub fn as_display(&self) -> GstGLDisplay {
+        GstGLDisplay(self.0)
+    }
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct GstGLContext(*mut c_void);
+
+unsafe impl Sync for GstGLContext {}
+unsafe impl Send for GstGLContext {}
+
+pub type GstGLPlatform = c_int;
+pub const GST_GL_PLATFORM_NONE: GstGLPlatform = 0;
+pub const GST_GL_PLATFORM_EGL: GstGLPlatform = 1;
+pub const GST_GL_PLATFORM_GLX: GstGLPlatform = 2;
+pub const GST_GL_PLATFORM_WGL: GstGLPlatform = 4;
+pub const GST_GL_PLATFORM_CGL: GstGLPlatform = 8;
+pub const GST_GL_PLATFORM_EAGL: GstGLPlatform = 16;
+pub const GST_GL_PLATFORM_ANY: GstGLPlatform = 4294967295;
+
+pub type GstGLAPI = c_int;
+pub const GST_GL_API_NONE: GstGLAPI = 0;
+pub const GST_GL_API_OPENGL: GstGLAPI = 1;
+pub const GST_GL_API_OPENGL3: GstGLAPI = 2;
+pub const GST_GL_API_GLES1: GstGLAPI = 32768;
+pub const GST_GL_API_GLES2: GstGLAPI = 65536;
+pub const GST_GL_API_ANY: GstGLPlatform = 4294967295;
 
 extern "C" {
-    pub fn gst_gl_display_new() -> *mut GstGLDisplay;
+    pub fn gst_gl_display_new() -> GstGLDisplay;
 
-    pub fn gst_gl_display_x11_new(name: *const c_char) -> *mut GstGLDisplayX11;
-    //pub fn gst_gl_display_x11_new_with_display(display: *mut x11::Display) -> *mut GstGLDisplayX11;
+    pub fn gst_gl_display_x11_new(name: *const c_char) -> GstGLDisplayX11;
+    pub fn gst_gl_display_x11_new_with_display(display: *mut x11_dl::xlib::Display) -> GstGLDisplayX11;
+
+    pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,
+        context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
+    pub fn gst_gl_context_get_type() -> GType;
 
     pub fn gst_context_new(context_type: *const c_char, persistent: gboolean) -> *mut GstContext;
 
-    pub fn gst_context_set_gl_display(context: *mut GstContext, display: *mut GstGLDisplay);
+    pub fn gst_context_set_gl_display(context: *mut GstContext, display: GstGLDisplay);
+
+    pub fn gst_structure_set(structure: *mut GstStructure, field_name: *const c_char, ...);
 }

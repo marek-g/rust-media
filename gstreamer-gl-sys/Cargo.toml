@@ -22,10 +22,11 @@ name = "gstreamer_gl_sys"
 
 [dependencies]
 glib-sys = "*"
+gtypes = "*"
 gstreamer-base-sys = "*"
 gstreamer-sys = "*"
 libc = "*"
-pkg-config = "*"
+x11-dl = "*"
 
 [build-dependencies]
 pkg-config = "*"

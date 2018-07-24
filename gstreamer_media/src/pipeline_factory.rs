@@ -2,10 +2,17 @@ extern crate gstreamer as gst;
 extern crate gstreamer_app as gst_app;
 extern crate gstreamer_gl_sys as gst_gl_sys;
 extern crate glutin;
+extern crate winit;
+
 use self::gst::prelude::*;
 use self::gst::MessageView;
 use self::gst::Context;
 use glib::Value;
+use std::sync::Arc;
+use std::ffi::CString;
+use self::winit::os::unix::x11::XConnection;
+use self::glutin::os::unix::RawHandle::Glx;
+use self::glutin::os::GlContextExt;
 
 pub fn create_pipeline_videotest() -> (gst::Pipeline, gst_app::AppSink) {
     let source = gst::ElementFactory::make("videotestsrc", "source").expect("Could not create source element.");
@@ -134,7 +141,8 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
     (pipeline, video_app_sink)
 }
 
-pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst::Pipeline, gst::Element) {
+pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
+    xconnection: &Arc<XConnection>) -> (gst::Pipeline, gst::Element) {
     let source = gst::ElementFactory::make("uridecodebin", "source")
         .expect("Could not create uridecodebin element.");
     source.set_property_from_str("uri", url);
@@ -160,6 +168,25 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
     // Create the empty pipeline
     let pipeline = gst::Pipeline::new("test-pipeline");
 
+    // get display & context handles
+    let gl_context = unsafe {
+        let context = context.raw_handle();
+        if let Glx(glx_context) = context {
+            glx_context as usize
+        } else {
+            unimplemented!()
+        }
+    };
+    let display = xconnection.display;
+
+    let gst_display = unsafe { gst_gl_sys::gst_gl_display_x11_new_with_display(display).as_display() };
+
+    // gst_sdl_context =
+    //  gst_gl_context_new_wrapped (sdl_gl_display, (guintptr) sdl_gl_context,
+    //  gst_gl_platform_from_string (platform), GST_GL_API_OPENGL);
+    let gst_context = unsafe { gst_gl_sys::gst_gl_context_new_wrapped(gst_display, gl_context as usize,
+        gst_gl_sys::GST_GL_PLATFORM_GLX, gst_gl_sys::GST_GL_API_OPENGL)  };
+
     let bus = pipeline.get_bus().unwrap();
     bus.add_signal_watch();
     bus.enable_sync_message_emission();
@@ -169,10 +196,6 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
                 let context_type = need_context.get_context_type();
                 let src = message.get_src().unwrap().dynamic_cast::<gst::Element>().unwrap();;
                 println!("need context: {:?}, src: {:?}", context_type, src);
-
-                let test = unsafe {
-                    gst_gl_sys::gst_gl_display_new();
-                };
 
                 // TODO: add binding for gst_gl_context_new_wrapped from /usr/lib/libgstgl-1.0
                 // (I've got GstGL-1.0.gir for it!)
@@ -184,21 +207,38 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
                 //      gst_gl_context_new_wrapped (sdl_gl_display, (guintptr) sdl_gl_context,
                 //      gst_gl_platform_from_string (platform), GST_GL_API_OPENGL);
 
-                if (context_type == "gst.gl.GLDisplay") {
+                if context_type == "gst.gl.GLDisplay" {
+                    /*unsafe {
+                        let context = gst_gl_sys::gst_context_new(CString::new("gst.gl.GLDisplay").unwrap().as_ptr(), 1);
+                        gst_gl_sys::gst_context_set_gl_display(context, gst_display);
+                    }*/
+
                     let context = Context::new("gst.gl.GLDisplay", true);
-                    
+
                     // TODO: add binding to /usr/lib/libgstgl-1.0
                     // (I've got GstGL-1.0.gir for it!)
                     //gst_context_set_gl_display (display_context, sdl_gl_display);
+                    unsafe {
+                        gst_gl_sys::gst_context_set_gl_display(context.as_mut_ptr(), gst_display);
+                    }
                     
                     src.set_context(&context);
-                } else if (context_type == "gst.gl.app_context") {
+                } else if context_type == "gst.gl.app_context" {
+                    //let context = gst_gl_sys::gst_context_new(CString::new("gst.gl.app_context").unwrap().as_ptr(), 1);
+
                     let mut context = Context::new("gst.gl.app_context", true);
                     {
                         let context_mut = context.make_mut();
                         let structure = context_mut.get_mut_structure();
+                        //structure.set("context", gl_context.to_value());
+                        unsafe {
+                            gst_gl_sys::gst_structure_set(structure.as_mut_ptr(),
+                                CString::new("context").unwrap().as_ptr(),
+                                gst_gl_sys::gst_gl_context_get_type(),
+                                gst_context, 0i32);
+                        }
                     }
-                    
+
                     // TODO: check, set doesn't pass value type, may require to bind to 'gst_structure_set' call 
                     //structure.set("context", gst_sdl_context);
                    

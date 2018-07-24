@@ -10,6 +10,8 @@ gstreamer-app = "*"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
 glib = "*"
 glutin = { git = "https://github.com/marek-g/glutin" }
+winit = "*"
+x11-dl = "*"
 
 [build-dependencies]
 pkg-config = "*"
