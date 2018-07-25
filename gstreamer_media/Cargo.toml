@@ -11,7 +11,9 @@ gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
 glib = "*"
 glutin = { git = "https://github.com/marek-g/glutin" }
 winit = "*"
-x11-dl = "*"
+
+[target."cfg(target_os = \"linux\")".dependencies.x11-dl]
+version = "*"
 
 [build-dependencies]
 pkg-config = "*"
