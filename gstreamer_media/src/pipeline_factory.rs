@@ -8,6 +8,8 @@ use self::gst::prelude::*;
 use self::gst::MessageView;
 use self::gst::Context;
 use glib::Value;
+use glib::translate::{from_glib, from_glib_full, from_glib_none, FromGlib,
+                      FromGlibPtrContainer, ToGlib, ToGlibPtr};
 use std::sync::Arc;
 use std::ffi::CString;
 use self::winit::os::unix::x11::XConnection;
@@ -157,12 +159,12 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
 
     video_sink.connect("client-reshape", false, move |args| {
         println!("client-reshape! {:?}", args);
-        Some(Value::from(&false))
+        Some(Value::from(&true))
     }).unwrap();
 
     video_sink.connect("client-draw", false, move |args| {
         println!("client-draw! {:?}", args);
-        Some(Value::from(&false))
+        Some(Value::from(&true))
     }).unwrap();
 
     // Create the empty pipeline
@@ -179,13 +181,32 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
     };
     let display = xconnection.display;
 
-    let gst_display = unsafe { gst_gl_sys::gst_gl_display_x11_new_with_display(display).as_display() };
+    let gst_display = unsafe { gst_gl_sys::gst_gl_display_x11_new_with_display(display) /*.as_display()*/ };
 
     // gst_sdl_context =
     //  gst_gl_context_new_wrapped (sdl_gl_display, (guintptr) sdl_gl_context,
     //  gst_gl_platform_from_string (platform), GST_GL_API_OPENGL);
-    let gst_context = unsafe { gst_gl_sys::gst_gl_context_new_wrapped(gst_display, gl_context as usize,
+    let gst_context = unsafe { gst_gl_sys::gst_gl_context_new_wrapped(gst_display.as_mut_ptr(), gl_context as usize,
         gst_gl_sys::GST_GL_PLATFORM_GLX, gst_gl_sys::GST_GL_API_OPENGL)  };
+
+
+    unsafe {
+        println!("     gl_display: {}, first_bytes: {} {} {} {}", display as usize,
+            *((display as usize + 0) as *const usize), *((display as usize + 8) as *const usize),
+            *((display as usize + 16) as *const usize), *((display as usize + 24) as *const usize),);
+        println!("    gst_display: {}, first_bytes: {} {} {} {}", gst_display.as_mut_ptr() as usize,
+            *((gst_display.as_mut_ptr() as usize + 0) as *const usize), *((gst_display.as_mut_ptr() as usize + 8) as *const usize),
+            *((gst_display.as_mut_ptr() as usize + 16) as *const usize), *((gst_display.as_mut_ptr() as usize + 24) as *const usize),);
+        
+        println!("     gl_context: {}, first_bytes: {} {} {} {}", gl_context as usize,
+            *((gl_context as usize + 0) as *const usize), *((gl_context as usize + 8) as *const usize),
+            *((gl_context as usize + 16) as *const usize), *((gl_context as usize + 24) as *const usize),);
+        println!("     gst_context: {}, first_bytes: {} {} {} {}", gst_context.as_mut_ptr() as usize,
+            *((gst_context.as_mut_ptr() as usize + 0) as *const usize), *((gst_context.as_mut_ptr() as usize + 8) as *const usize),
+            *((gst_context.as_mut_ptr() as usize + 16) as *const usize), *((gst_context.as_mut_ptr() as usize + 24) as *const usize),);
+    }
+
+
 
     let bus = pipeline.get_bus().unwrap();
     bus.add_signal_watch();
@@ -210,7 +231,8 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
                 if context_type == "gst.gl.GLDisplay" {
                     /*unsafe {
                         let context = gst_gl_sys::gst_context_new(CString::new("gst.gl.GLDisplay").unwrap().as_ptr(), 1);
-                        gst_gl_sys::gst_context_set_gl_display(context, gst_display);
+                        gst_gl_sys::gst_context_set_gl_display(context, gst_display.as_mut_ptr());
+                        gst_gl_sys::gst_element_set_context(src.as_mut_ptr(), context);
                     }*/
 
                     let context = Context::new("gst.gl.GLDisplay", true);
@@ -219,7 +241,7 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
                     // (I've got GstGL-1.0.gir for it!)
                     //gst_context_set_gl_display (display_context, sdl_gl_display);
                     unsafe {
-                        gst_gl_sys::gst_context_set_gl_display(context.as_mut_ptr(), gst_display);
+                        gst_gl_sys::gst_context_set_gl_display(context.to_glib_none().0, gst_display.as_mut_ptr());
                     }
                     
                     src.set_context(&context);
@@ -230,12 +252,12 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
                     {
                         let context_mut = context.make_mut();
                         let structure = context_mut.get_mut_structure();
-                        //structure.set("context", gl_context.to_value());
+                        //structure.set("context", &(gst_context.as_mut_ptr() as i64));
                         unsafe {
                             gst_gl_sys::gst_structure_set(structure.as_mut_ptr(),
-                                CString::new("context").unwrap().as_ptr(),
+                                "context".to_glib_none().0,
                                 gst_gl_sys::gst_gl_context_get_type(),
-                                gst_context, 0i32);
+                                gst_context.as_mut_ptr(), 0i32);
                         }
                     }
 

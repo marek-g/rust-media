@@ -25,6 +25,12 @@ pub struct GstGLDisplay(*mut c_void);
 unsafe impl Sync for GstGLDisplay {}
 unsafe impl Send for GstGLDisplay {}
 
+impl GstGLDisplay {
+    pub fn as_mut_ptr(&self) -> *mut c_void {
+        self.0
+    }
+}
+
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct GstGLDisplayX11(*mut c_void);
@@ -36,6 +42,10 @@ impl GstGLDisplayX11 {
     pub fn as_display(&self) -> GstGLDisplay {
         GstGLDisplay(self.0)
     }
+
+    pub fn as_mut_ptr(&self) -> *mut c_void {
+        self.0
+    }
 }
 
 #[repr(C)]
@@ -44,6 +54,12 @@ pub struct GstGLContext(*mut c_void);
 
 unsafe impl Sync for GstGLContext {}
 unsafe impl Send for GstGLContext {}
+
+impl GstGLContext {
+    pub fn as_mut_ptr(&self) -> *mut c_void {
+        self.0
+    }
+}
 
 pub type GstGLPlatform = c_int;
 pub const GST_GL_PLATFORM_NONE: GstGLPlatform = 0;
@@ -64,17 +80,17 @@ pub const GST_GL_API_ANY: GstGLPlatform = 4294967295;
 
 extern "C" {
     pub fn gst_gl_display_new() -> GstGLDisplay;
-
     pub fn gst_gl_display_x11_new(name: *const c_char) -> GstGLDisplayX11;
     pub fn gst_gl_display_x11_new_with_display(display: *mut x11_dl::xlib::Display) -> GstGLDisplayX11;
 
-    pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,
+    //pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,
+    //    context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
+    pub fn gst_gl_context_new_wrapped(display: *mut c_void, handle: gtypes::primitive::guintptr,
         context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
     pub fn gst_gl_context_get_type() -> GType;
 
     pub fn gst_context_new(context_type: *const c_char, persistent: gboolean) -> *mut GstContext;
-
-    pub fn gst_context_set_gl_display(context: *mut GstContext, display: GstGLDisplay);
-
+    pub fn gst_context_set_gl_display(context: *mut GstContext, display: *mut c_void); //display: GstGLDisplay);
     pub fn gst_structure_set(structure: *mut GstStructure, field_name: *const c_char, ...);
+    pub fn gst_element_set_context(element: *mut c_void, context: *mut GstContext);
 }
