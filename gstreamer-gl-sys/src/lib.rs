@@ -4,8 +4,10 @@ extern crate libc;
 extern crate glib_sys as glib;
 extern crate gstreamer_sys as gst;
 extern crate gstreamer_base_sys as gst_base;
-extern crate x11_dl;
 extern crate gtypes;
+
+#[cfg(target_os="linux")]
+extern crate x11_dl;
 
 #[allow(unused_imports)]
 use libc::{c_int, c_char, c_uchar, c_float, c_uint, c_double,
@@ -80,7 +82,10 @@ pub const GST_GL_API_ANY: GstGLPlatform = 4294967295;
 
 extern "C" {
     pub fn gst_gl_display_new() -> GstGLDisplay;
+
+    #[cfg(target_os="linux")]
     pub fn gst_gl_display_x11_new(name: *const c_char) -> GstGLDisplayX11;
+    #[cfg(target_os="linux")]
     pub fn gst_gl_display_x11_new_with_display(display: *mut x11_dl::xlib::Display) -> GstGLDisplayX11;
 
     //pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,

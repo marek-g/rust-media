@@ -26,7 +26,9 @@ gtypes = "*"
 gstreamer-base-sys = "*"
 gstreamer-sys = "*"
 libc = "*"
-x11-dl = "*"
+
+[target."cfg(target_os = \"linux\")".dependencies.x11-dl]
+version = "*"
 
 [build-dependencies]
 pkg-config = "*"
