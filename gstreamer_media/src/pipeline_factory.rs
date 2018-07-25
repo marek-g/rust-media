@@ -157,16 +157,6 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
     let video_sink = gst::ElementFactory::make("glimagesink", "videosink").expect("Could not create sink element");
     let audio_sink = gst::ElementFactory::make("autoaudiosink", "audiosink").expect("Could not create sink element.");
 
-    video_sink.connect("client-reshape", false, move |args| {
-        println!("client-reshape! {:?}", args);
-        Some(Value::from(&true))
-    }).unwrap();
-
-    video_sink.connect("client-draw", false, move |args| {
-        println!("client-draw! {:?}", args);
-        Some(Value::from(&true))
-    }).unwrap();
-
     // Create the empty pipeline
     let pipeline = gst::Pipeline::new("test-pipeline");
 
