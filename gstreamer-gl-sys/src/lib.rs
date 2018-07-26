@@ -88,11 +88,14 @@ extern "C" {
     #[cfg(target_os="linux")]
     pub fn gst_gl_display_x11_new_with_display(display: *mut x11_dl::xlib::Display) -> GstGLDisplayX11;
 
+    pub fn gst_gl_context_new(display: *mut c_void) -> GstGLContext;
     //pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,
     //    context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
     pub fn gst_gl_context_new_wrapped(display: *mut c_void, handle: gtypes::primitive::guintptr,
         context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
     pub fn gst_gl_context_get_type() -> GType;
+    pub fn gst_gl_context_get_gl_platform(context: GstGLContext) -> GstGLPlatform;
+    pub fn gst_gl_context_get_gl_api(context: GstGLContext) -> GstGLAPI;
 
     pub fn gst_context_new(context_type: *const c_char, persistent: gboolean) -> *mut GstContext;
     pub fn gst_context_set_gl_display(context: *mut GstContext, display: *mut c_void); //display: GstGLDisplay);

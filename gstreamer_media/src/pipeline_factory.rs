@@ -376,11 +376,10 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
 
     let gst_display = unsafe { gst_gl_sys::gst_gl_display_new() /*.as_display()*/ };
 
-    // gst_sdl_context =
-    //  gst_gl_context_new_wrapped (sdl_gl_display, (guintptr) sdl_gl_context,
-    //  gst_gl_platform_from_string (platform), GST_GL_API_OPENGL);
-    let gst_context = unsafe { gst_gl_sys::gst_gl_context_new_wrapped(gst_display.as_mut_ptr(), gl_context as usize,
-        gst_gl_sys::GST_GL_PLATFORM_GLX, gst_gl_sys::GST_GL_API_OPENGL)  };
+    //let gst_context = unsafe { gst_gl_sys::gst_gl_context_new_wrapped(gst_display.as_mut_ptr(), gl_context as usize,
+      //  gst_gl_sys::GST_GL_PLATFORM_WGL, gst_gl_sys::GST_GL_API_OPENGL)  };
+
+    let gst_context = unsafe { gst_gl_sys::gst_gl_context_new(gst_display.as_mut_ptr())  };
 
 
     unsafe {
@@ -397,6 +396,8 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
         println!("     gst_context: {}, first_bytes: {} {} {} {}", gst_context.as_mut_ptr() as usize,
             *((gst_context.as_mut_ptr() as usize + 0) as *const usize), *((gst_context.as_mut_ptr() as usize + 8) as *const usize),
             *((gst_context.as_mut_ptr() as usize + 16) as *const usize), *((gst_context.as_mut_ptr() as usize + 24) as *const usize),);
+        println!("platform: {}, api: {}", gst_gl_sys::gst_gl_context_get_gl_platform(gst_context),
+            gst_gl_sys::gst_gl_context_get_gl_api(gst_context));
     }
 
 
@@ -405,6 +406,9 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
     bus.add_signal_watch();
     bus.enable_sync_message_emission();
     bus.connect_sync_message(move |_bus, message| {
+        
+        //return;
+        
         match message.view() {
             MessageView::NeedContext(need_context) => {
                 let context_type = need_context.get_context_type();
@@ -461,7 +465,9 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
                     //gst_structure_set (s, "context", gst_gl_context_get_type(),
                     //								   gst_sdl_context,
                     //            NULL);
-                    src.set_context(&context);
+
+                    // THIS FAILS ON WINDOWS (play doesn't start later)! WHY?
+                    //src.set_context(&context);
                 }
             },
             _ => (),
