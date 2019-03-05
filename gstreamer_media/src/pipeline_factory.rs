@@ -121,7 +121,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);
@@ -137,7 +137,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);
@@ -518,7 +518,7 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);
@@ -534,7 +534,7 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context) -> (gst:
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);

@@ -9,7 +9,8 @@ gstreamer = "*"
 gstreamer-app = "*"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
 glib = "*"
-glutin = { git = "https://github.com/marek-g/glutin" }
+glutin = "*"
+#glutin = { git = "https://github.com/marek-g/glutin" }
 winit = "*"
 
 [target."cfg(target_os = \"linux\")".dependencies.x11-dl]
