@@ -70,7 +70,7 @@ pub const GST_GL_PLATFORM_GLX: GstGLPlatform = 2;
 pub const GST_GL_PLATFORM_WGL: GstGLPlatform = 4;
 pub const GST_GL_PLATFORM_CGL: GstGLPlatform = 8;
 pub const GST_GL_PLATFORM_EAGL: GstGLPlatform = 16;
-pub const GST_GL_PLATFORM_ANY: GstGLPlatform = 4294967295;
+pub const GST_GL_PLATFORM_ANY: GstGLPlatform = -1;
 
 pub type GstGLAPI = c_int;
 pub const GST_GL_API_NONE: GstGLAPI = 0;
@@ -78,7 +78,7 @@ pub const GST_GL_API_OPENGL: GstGLAPI = 1;
 pub const GST_GL_API_OPENGL3: GstGLAPI = 2;
 pub const GST_GL_API_GLES1: GstGLAPI = 32768;
 pub const GST_GL_API_GLES2: GstGLAPI = 65536;
-pub const GST_GL_API_ANY: GstGLPlatform = 4294967295;
+pub const GST_GL_API_ANY: GstGLPlatform = -1;
 
 extern "C" {
     pub fn gst_gl_display_new() -> GstGLDisplay;

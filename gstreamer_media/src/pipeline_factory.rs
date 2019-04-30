@@ -12,7 +12,8 @@ use glib::translate::{from_glib, from_glib_full, from_glib_none, FromGlib,
                       FromGlibPtrContainer, ToGlib, ToGlibPtr};
 use std::sync::Arc;
 use std::ffi::CString;
-use self::glutin::os::GlContextExt;
+use self::glutin::os::ContextTraitExt;
+use self::glutin::PossiblyCurrent;
 
 #[cfg(target_os = "linux")]
 use self::winit::os::unix::x11::XConnection;
@@ -151,7 +152,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
 }
 
 #[cfg(target_os = "linux")]
-pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
+pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context<PossiblyCurrent>,
     xconnection: &Arc<XConnection>) -> (gst::Pipeline, gst::Element) {
     let source = gst::ElementFactory::make("uridecodebin", "source")
         .expect("Could not create uridecodebin element.");
@@ -317,7 +318,7 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);
@@ -333,7 +334,7 @@ pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context,
             }
 
             let ret = src_pad.link(&sink_pad);
-            if ret != gst::PadLinkReturn::Ok {
+            if let Ok(_) = ret {
                 println!("Type is {} but link failed.", new_pad_type);
             } else {
                 println!("Link succeeded (type {}).", new_pad_type);
