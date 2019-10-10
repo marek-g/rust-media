@@ -25,23 +25,23 @@ use self::glutin::os::windows::RawHandle::Wgl;
 
 
 pub fn create_pipeline_videotest() -> (gst::Pipeline, gst_app::AppSink) {
-    let source = gst::ElementFactory::make("videotestsrc", "source").expect("Could not create source element.");
+    let source = gst::ElementFactory::make("videotestsrc", Some("source")).expect("Could not create source element.");
     source.set_property_from_str("pattern", "smpte");
 
-    let video_sink = gst::ElementFactory::make("appsink", "sink").expect("Could not create sink element");
+    let video_sink = gst::ElementFactory::make("appsink", Some("sink")).expect("Could not create sink element");
     let video_app_sink = video_sink.dynamic_cast::<gst_app::AppSink>().unwrap();
-    video_app_sink.set_caps(&gst::Caps::new_simple(
+    video_app_sink.set_caps(Some(&gst::Caps::new_simple(
         "video/x-raw",
         &[
             ("format", &"BGRA"),
             ("pixel-aspect-ratio", &gst::Fraction::from((1, 1))),
         ],
-    ));
+    )));
 
     let video_sink = video_app_sink.dynamic_cast::<gst::Element>().unwrap();
 
     // Create the empty pipeline
-    let pipeline = gst::Pipeline::new("test-pipeline");
+    let pipeline = gst::Pipeline::new(Some("test-pipeline"));
 
     // Build the pipeline
     pipeline.add_many(&[&source, &video_sink]).unwrap();
@@ -53,31 +53,31 @@ pub fn create_pipeline_videotest() -> (gst::Pipeline, gst_app::AppSink) {
 }
 
 pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSink) {
-    let source = gst::ElementFactory::make("uridecodebin", "source")
+    let source = gst::ElementFactory::make("uridecodebin", Some("source"))
         .expect("Could not create uridecodebin element.");
     source.set_property_from_str("uri", url);
 
-    let video_convert = gst::ElementFactory::make("videoconvert", "videoconvert")
+    let video_convert = gst::ElementFactory::make("videoconvert", Some("videoconvert"))
         .expect("Could not create videoconvert element.");
-    let audio_convert = gst::ElementFactory::make("audioconvert", "audioconvert")
+    let audio_convert = gst::ElementFactory::make("audioconvert", Some("audioconvert"))
         .expect("Could not create audioconvert element.");
 
-    let video_sink = gst::ElementFactory::make("appsink", "videosink").expect("Could not create sink element");
-    let audio_sink = gst::ElementFactory::make("autoaudiosink", "audiosink").expect("Could not create sink element.");
+    let video_sink = gst::ElementFactory::make("appsink", Some("videosink")).expect("Could not create sink element");
+    let audio_sink = gst::ElementFactory::make("autoaudiosink", Some("audiosink")).expect("Could not create sink element.");
 
     let video_app_sink = video_sink.dynamic_cast::<gst_app::AppSink>().unwrap();
-    video_app_sink.set_caps(&gst::Caps::new_simple(
+    video_app_sink.set_caps(Some(&gst::Caps::new_simple(
         "video/x-raw",
         &[
             ("format", &"BGRA"),
             ("pixel-aspect-ratio", &gst::Fraction::from((1, 1))),
         ],
-    ));
+    )));
 
     let video_sink = video_app_sink.dynamic_cast::<gst::Element>().unwrap();
 
     // Create the empty pipeline
-    let pipeline = gst::Pipeline::new("test-pipeline");
+    let pipeline = gst::Pipeline::new(Some("test-pipeline"));
 
     // Build the pipeline
     pipeline.add_many(&[&source, &video_convert, &video_sink, &audio_convert, &audio_sink]).unwrap();
@@ -154,20 +154,20 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
 #[cfg(target_os = "linux")]
 pub fn create_opengl_pipeline_url(url: &str, context: &glutin::Context<PossiblyCurrent>,
     xconnection: &Arc<XConnection>) -> (gst::Pipeline, gst::Element) {
-    let source = gst::ElementFactory::make("uridecodebin", "source")
+    let source = gst::ElementFactory::make("uridecodebin", Some("source"))
         .expect("Could not create uridecodebin element.");
     source.set_property_from_str("uri", url);
 
     //let video_convert = gst::ElementFactory::make("videoconvert", "videoconvert")
       //  .expect("Could not create videoconvert element.");
-    let audio_convert = gst::ElementFactory::make("audioconvert", "audioconvert")
+    let audio_convert = gst::ElementFactory::make("audioconvert", Some("audioconvert"))
         .expect("Could not create audioconvert element.");
 
-    let video_sink = gst::ElementFactory::make("glimagesink", "videosink").expect("Could not create sink element");
-    let audio_sink = gst::ElementFactory::make("autoaudiosink", "audiosink").expect("Could not create sink element.");
+    let video_sink = gst::ElementFactory::make("glimagesink", Some("videosink")).expect("Could not create sink element");
+    let audio_sink = gst::ElementFactory::make("autoaudiosink", Some("audiosink")).expect("Could not create sink element.");
 
     // Create the empty pipeline
-    let pipeline = gst::Pipeline::new("test-pipeline");
+    let pipeline = gst::Pipeline::new(Some("test-pipeline"));
 
     // get display & context handles
     let gl_context = unsafe {
