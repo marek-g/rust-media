@@ -4,17 +4,16 @@ version = "0.1.0"
 authors = ["Marek G <no@mail.com>"]
 
 [dependencies]
-failure = "*"
-gstreamer = "*"
-gstreamer-app = "*"
+failure = "0.1"
+gstreamer = "0.14"
+gstreamer-app = "0.14"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
-glib = "*"
-glutin = "*"
-#glutin = { git = "https://github.com/marek-g/glutin" }
-winit = "*"
+glib = "0.8"
+glutin = "0.22.0-alpha3"
+winit = "0.20.0-alpha4"
 
 [target."cfg(target_os = \"linux\")".dependencies.x11-dl]
-version = "*"
+version = "2.18"
 
 [build-dependencies]
-pkg-config = "*"
+pkg-config = "0.3"
