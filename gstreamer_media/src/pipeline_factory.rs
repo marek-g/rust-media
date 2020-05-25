@@ -22,7 +22,7 @@ use self::glutin::platform::unix::RawHandle::Glx;
 use self::winit::platform::unix::x11::XConnection;
 
 #[cfg(target_os = "windows")]
-use self::glutin::os::windows::RawHandle::Wgl;
+use self::glutin::platform::windows::RawHandle::Wgl;
 
 pub fn create_pipeline_videotest() -> (gst::Pipeline, gst_app::AppSink) {
     let source = gst::ElementFactory::make("videotestsrc", Some("source"))
@@ -419,24 +419,24 @@ pub fn create_opengl_pipeline_url(
 #[cfg(target_os = "windows")]
 pub fn create_opengl_pipeline_url(
     url: &str,
-    context: &glutin::Context,
+    context: &glutin::Context<PossiblyCurrent>,
 ) -> (gst::Pipeline, gst::Element) {
-    let source = gst::ElementFactory::make("uridecodebin", "source")
+    let source = gst::ElementFactory::make("uridecodebin", Some("source"))
         .expect("Could not create uridecodebin element.");
     source.set_property_from_str("uri", url);
 
     //let video_convert = gst::ElementFactory::make("videoconvert", "videoconvert")
     //  .expect("Could not create videoconvert element.");
-    let audio_convert = gst::ElementFactory::make("audioconvert", "audioconvert")
+    let audio_convert = gst::ElementFactory::make("audioconvert", Some("audioconvert"))
         .expect("Could not create audioconvert element.");
 
-    let video_sink = gst::ElementFactory::make("glimagesink", "videosink")
+    let video_sink = gst::ElementFactory::make("glimagesink", Some("videosink"))
         .expect("Could not create sink element");
-    let audio_sink = gst::ElementFactory::make("autoaudiosink", "audiosink")
+    let audio_sink = gst::ElementFactory::make("autoaudiosink", Some("audiosink"))
         .expect("Could not create sink element.");
 
     // Create the empty pipeline
-    let pipeline = gst::Pipeline::new("test-pipeline");
+    let pipeline = gst::Pipeline::new(Some("test-pipeline"));
 
     // get display & context handles
     let gl_context = unsafe {
@@ -506,7 +506,7 @@ pub fn create_opengl_pipeline_url(
                     .get_src()
                     .unwrap()
                     .dynamic_cast::<gst::Element>()
-                    .unwrap();;
+                    .unwrap();
                 println!("need context: {:?}, src: {:?}", context_type, src);
 
                 // TODO: add binding for gst_gl_context_new_wrapped from /usr/lib/libgstgl-1.0

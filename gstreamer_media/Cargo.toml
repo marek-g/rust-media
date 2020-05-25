@@ -5,12 +5,12 @@ authors = ["Marek G <no@mail.com>"]
 
 [dependencies]
 failure = "0.1"
-gstreamer = "0.14"
-gstreamer-app = "0.14"
+gstreamer = "0.15"
+gstreamer-app = "0.15"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
-glib = "0.8"
-glutin = "0.22.0-alpha3"
-winit = "0.20.0-alpha4"
+glib = "0.9"
+glutin = "0.24"
+winit = "0.22"
 
 [target."cfg(target_os = \"linux\")".dependencies.x11-dl]
 version = "2.18"
