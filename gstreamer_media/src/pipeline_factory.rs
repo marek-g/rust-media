@@ -268,7 +268,7 @@ pub fn create_opengl_pipeline_url(
                     .get_src()
                     .unwrap()
                     .dynamic_cast::<gst::Element>()
-                    .unwrap();;
+                    .unwrap();
                 println!("need context: {:?}, src: {:?}", context_type, src);
 
                 // TODO: add binding for gst_gl_context_new_wrapped from /usr/lib/libgstgl-1.0

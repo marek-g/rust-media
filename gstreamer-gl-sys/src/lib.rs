@@ -1,18 +1,17 @@
 #![allow(non_camel_case_types, non_upper_case_globals, non_snake_case)]
 
-extern crate libc;
-extern crate glib_sys as glib;
-extern crate gstreamer_sys as gst;
-extern crate gstreamer_base_sys as gst_base;
-extern crate gtypes;
+use glib_sys as glib;
+use gstreamer_base_sys as gst_base;
+use gstreamer_sys as gst;
 
-#[cfg(target_os="linux")]
+#[cfg(target_os = "linux")]
 extern crate x11_dl;
 
 #[allow(unused_imports)]
-use libc::{c_int, c_char, c_uchar, c_float, c_uint, c_double,
-    c_short, c_ushort, c_long, c_ulong,
-    c_void, size_t, ssize_t, intptr_t, uintptr_t, time_t, FILE};
+use libc::{
+    c_char, c_double, c_float, c_int, c_long, c_short, c_uchar, c_uint, c_ulong, c_ushort, c_void,
+    intptr_t, size_t, ssize_t, time_t, uintptr_t, FILE,
+};
 
 #[allow(unused_imports)]
 use glib::{gboolean, gconstpointer, gpointer, GType};
@@ -83,16 +82,22 @@ pub const GST_GL_API_ANY: GstGLPlatform = -1;
 extern "C" {
     pub fn gst_gl_display_new() -> GstGLDisplay;
 
-    #[cfg(target_os="linux")]
+    #[cfg(target_os = "linux")]
     pub fn gst_gl_display_x11_new(name: *const c_char) -> GstGLDisplayX11;
-    #[cfg(target_os="linux")]
-    pub fn gst_gl_display_x11_new_with_display(display: *mut x11_dl::xlib::Display) -> GstGLDisplayX11;
+    #[cfg(target_os = "linux")]
+    pub fn gst_gl_display_x11_new_with_display(
+        display: *mut x11_dl::xlib::Display,
+    ) -> GstGLDisplayX11;
 
     pub fn gst_gl_context_new(display: *mut c_void) -> GstGLContext;
     //pub fn gst_gl_context_new_wrapped(display: GstGLDisplay, handle: gtypes::primitive::guintptr,
     //    context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
-    pub fn gst_gl_context_new_wrapped(display: *mut c_void, handle: gtypes::primitive::guintptr,
-        context_type: GstGLPlatform, available_apis: GstGLAPI) -> GstGLContext;
+    pub fn gst_gl_context_new_wrapped(
+        display: *mut c_void,
+        handle: gtypes::primitive::guintptr,
+        context_type: GstGLPlatform,
+        available_apis: GstGLAPI,
+    ) -> GstGLContext;
     pub fn gst_gl_context_get_type() -> GType;
     pub fn gst_gl_context_get_gl_platform(context: GstGLContext) -> GstGLPlatform;
     pub fn gst_gl_context_get_gl_api(context: GstGLContext) -> GstGLAPI;

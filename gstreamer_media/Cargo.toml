@@ -2,9 +2,9 @@
 name = "gstreamer_media"
 version = "0.1.0"
 authors = ["Marek G <no@mail.com>"]
+edition = "2018"
 
 [dependencies]
-failure = "0.1"
 gstreamer = "0.15"
 gstreamer-app = "0.15"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }

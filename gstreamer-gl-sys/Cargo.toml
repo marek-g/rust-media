@@ -16,6 +16,7 @@ version = "0.1.0"
 build = "build.rs"
 links = "gstgl-1.0"
 description = "FFI bindings to libgstgl-1.0"
+edition = "2018"
 
 [lib]
 name = "gstreamer_gl_sys"
