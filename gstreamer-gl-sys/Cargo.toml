@@ -22,10 +22,10 @@ edition = "2018"
 name = "gstreamer_gl_sys"
 
 [dependencies]
-glib-sys = "0.9"
+glib-sys = "0.10"
 gtypes = "0.2"
-gstreamer-base-sys = "0.8"
-gstreamer-sys = "0.8"
+gstreamer-base-sys = "0.9"
+gstreamer-sys = "0.9"
 libc = "0.2"
 
 [target."cfg(target_os = \"linux\")".dependencies.x11-dl]

@@ -5,10 +5,10 @@ authors = ["Marek G <no@mail.com>"]
 edition = "2018"
 
 [dependencies]
-gstreamer = "0.15"
-gstreamer-app = "0.15"
+gstreamer = "0.16"
+gstreamer-app = "0.16"
 gstreamer-gl-sys = { path = "../gstreamer-gl-sys", version = "*" }
-glib = "0.9"
+glib = "0.10"
 glutin = "0.24"
 winit = "0.22"
 
