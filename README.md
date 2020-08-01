@@ -1,4 +1,4 @@
-# media_gstreamer
+# rust-media
 
 Multimedia player framework.
 
