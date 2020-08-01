@@ -1,10 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "gstreamer-gl-sys"
-		},
-		{
-			"path": "gstreamer_media"
+			"path": "media_gstreamer"
 		},
 	],
 	"settings": {}

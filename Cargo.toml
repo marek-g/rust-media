@@ -1,6 +1,5 @@
 [workspace]
 
 members = [
-    "gstreamer_media",
-    "gstreamer-gl-sys",
+    "media_gstreamer",
 ]
