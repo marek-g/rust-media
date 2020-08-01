@@ -1,6 +1,6 @@
 # media_gstreamer
 
-"Multimedia player - gstreamer backend.
+Multimedia player.
 
 ## Backends
 
