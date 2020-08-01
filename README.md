@@ -1,6 +1,6 @@
 # media_gstreamer
 
-Multimedia player.
+Multimedia player framework.
 
 ## Backends
 
