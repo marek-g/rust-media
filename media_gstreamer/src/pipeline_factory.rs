@@ -143,17 +143,17 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
 
         println!(
             "Received new pad {} from {}",
-            src_pad.get_name(),
-            pipeline.get_name()
+            src_pad.name(),
+            pipeline.name()
         );
 
         let new_pad_caps = src_pad
-            .get_current_caps()
+            .current_caps()
             .expect("Failed to get caps of new pad.");
         let new_pad_struct = new_pad_caps
-            .get_structure(0)
+            .structure(0)
             .expect("Failed to get first structure of caps.");
-        let new_pad_type = new_pad_struct.get_name();
+        let new_pad_type = new_pad_struct.name();
 
         println!("src pad type: {}", new_pad_type);
 
@@ -162,7 +162,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
 
         if is_video {
             let sink_pad = video_sink
-                .get_static_pad("sink")
+                .static_pad("sink")
                 .expect("Failed to get static sink pad from convert");
             if sink_pad.is_linked() {
                 println!("We are already linked. Ignoring.");
@@ -179,7 +179,7 @@ pub fn create_appsink_pipeline_url(url: &str) -> (gst::Pipeline, gst_app::AppSin
 
         if is_audio {
             let sink_pad = audio_sink
-                .get_static_pad("sink")
+                .static_pad("sink")
                 .expect("Failed to get static sink pad from convert");
             if sink_pad.is_linked() {
                 println!("We are already linked. Ignoring.");
@@ -235,7 +235,7 @@ pub fn create_opengl_pipeline_url(
     let display = xconnection.display;
 
     let gst_display = unsafe {
-        GstGLDisplaySend(gst_gl_sys::gst_gl_display_x11_new_with_display(display as glib::glib_sys::gpointer) as *mut gst_gl_sys::GstGLDisplay)
+        GstGLDisplaySend(gstreamer_gl_x11_sys::gst_gl_display_x11_new_with_display(display as glib::ffi::gpointer) as *mut gst_gl_sys::GstGLDisplay)
     };
 
     // gst_sdl_context =
@@ -286,15 +286,15 @@ pub fn create_opengl_pipeline_url(
         );
     }
 
-    let bus = pipeline.get_bus().unwrap();
+    let bus = pipeline.bus().unwrap();
     bus.add_signal_watch();
     bus.enable_sync_message_emission();
-    bus.connect_sync_message(move |_bus, message| {
+    bus.connect_sync_message(None, move |_bus, message| {
         match message.view() {
             MessageView::NeedContext(need_context) => {
-                let context_type = need_context.get_context_type();
+                let context_type = need_context.context_type();
                 let src = message
-                    .get_src()
+                    .src()
                     .unwrap()
                     .dynamic_cast::<gst::Element>()
                     .unwrap();
@@ -335,7 +335,7 @@ pub fn create_opengl_pipeline_url(
                     let mut context = Context::new("gst.gl.app_context", true);
                     {
                         let context_mut = context.make_mut();
-                        let structure = context_mut.get_mut_structure();
+                        let structure = context_mut.structure();
                         //structure.set("context", &(gst_context.as_mut_ptr() as i64));
                         unsafe {
                             gstreamer_sys::gst_structure_set(
@@ -388,17 +388,17 @@ pub fn create_opengl_pipeline_url(
 
         println!(
             "Received new pad {} from {}",
-            src_pad.get_name(),
-            pipeline.get_name()
+            src_pad.name(),
+            pipeline.name()
         );
 
         let new_pad_caps = src_pad
-            .get_current_caps()
+            .current_caps()
             .expect("Failed to get caps of new pad.");
         let new_pad_struct = new_pad_caps
-            .get_structure(0)
+            .structure(0)
             .expect("Failed to get first structure of caps.");
-        let new_pad_type = new_pad_struct.get_name();
+        let new_pad_type = new_pad_struct.name();
 
         println!("src pad type: {}", new_pad_type);
 
@@ -407,7 +407,7 @@ pub fn create_opengl_pipeline_url(
 
         if is_video {
             let sink_pad = video_sink
-                .get_static_pad("sink")
+                .static_pad("sink")
                 .expect("Failed to get static sink pad from convert");
             if sink_pad.is_linked() {
                 println!("We are already linked. Ignoring.");
@@ -424,7 +424,7 @@ pub fn create_opengl_pipeline_url(
 
         if is_audio {
             let sink_pad = audio_sink
-                .get_static_pad("sink")
+                .static_pad("sink")
                 .expect("Failed to get static sink pad from convert");
             if sink_pad.is_linked() {
                 println!("We are already linked. Ignoring.");
